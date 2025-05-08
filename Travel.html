@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Roboto:wght@400&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .navbar {
+            background-color: #333;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 14px 20px;
+            display: block;
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .navbar a:hover {
+            background-color: #575757;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            padding: 20px;
+        }
+        .travel-card {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        .travel-card img {
+            width: 300px;
+            border-radius: 8px;
+        }
+        .travel-text h3 {
+            margin-top: 0;
+            font-size: 20px;
+        }
+        .travel-text p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+	<div class="navbar">
+        <a href="Home.html">Home</a>
+	    <a href="Projects.html">Projects</a>
+        <a href="Education.html">Education</a>
+        <a href="Travel.html">Travel</a>
+        <a href="Pets.html">Pets</a>
+    </div>
+    
+    <div class="container">
+        <div class="travel-card">
+            <img src="images/Europe Picture.jpg" alt="Europe Picture">
+            <div class="travel-text">
+                <h3>Europe Trip</h3>
+                <p>
+                    In 2022 I took a group trip to Europe where I saw some of the most historically important places in the multiple countries we visited. We went to Britain, France, Belgium, and Germany. The weather was extremely pleasant throughout the little more 
+                    than a week the trip lasted. I took a train and ferry ride for the first time in my life during it.
+                </p>
+            </div>
+        </div>
+
+        <div class="travel-card">
+            <img src="images/Solar Eclipse Picture.jpg" alt="Solar Eclipse Picture">
+            <div class="travel-text">
+                <h3>Solar Eclipse</h3>
+                <p>
+                    When the path of the solar eclipse went over Indiana in 2024 I took a trip to witness it along the path of the totality. It was an awesome experience and because of the spot I was in, I was able to view it without special solar glasses because the 
+                    moon covered so much of the sun's light. I got to see areas that I hadn't been before since I camped for two nights leading up to the event.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
