@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Filtered Listings</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background: #f5f5f5;
+    }
+
+    h2 {
+      color: #00E;
+    }
+
+    .back-home {
+      margin-bottom: 20px;
+    }
+
+    .back-home button {
+      background-color: #00E;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .back-home button:hover {
+      background-color: #800080;
+    }
+
+    .listing {
+      background: white;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .listing img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .listing-details {
+      flex-grow: 1;
+    }
+
+    .listing p {
+      margin: 5px 0;
+    }
+
+    .listing .price {
+      font-weight: bold;
+      color: #008000;
+    }
+
+    .buttons {
+      margin-top: 10px;
+    }
+
+    .buttons button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      background-color: #ff9900;
+      color: white;
+    }
+
+    .buttons button:hover {
+      opacity: 0.9;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      box-sizing: border-box;
+    }
+
+    .modal-content input {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .modal-content button {
+      padding: 8px 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 4px;
+      background-color: #00E;
+      color: white;
+      cursor: pointer;
+    }
+
+    .modal-content button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="back-home">
+    <button onclick="window.location.href='Homepage.html'">← Back to Home</button>
+  </div>
+
+  <h2 id="title"></h2>
+  <div id="listingsContainer"></div>
+
+  <div class="modal" id="offerModal">
+    <div class="modal-content">
+      <h3>Send Offer</h3>
+      <input type="number" id="offerPrice" placeholder="Offer price ($)">
+      <input type="tel" id="offerPhone" placeholder="Your phone number">
+      <button onclick="submitOffer()">Submit Offer</button>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const city = params.get('city');
+    const subcategory = params.get('subcategory');
+    const listings = JSON.parse(localStorage.getItem('listings') || '[]');
+
+    const filtered = listings.filter(
+      item => item.city === city && item.category.includes(subcategory)
+    );
+
+    document.getElementById('title').textContent = `Listings for ${subcategory} in ${city}`;
+    const container = document.getElementById('listingsContainer');
+
+    let selectedListing = null;
+
+    if (filtered.length === 0) {
+      container.innerHTML = "<p>No listings found.</p>";
+    } else {
+      filtered.forEach((listing, index) => {
+        const div = document.createElement('div');
+        div.className = 'listing';
+        div.innerHTML = `
+          <img src="${listing.image}" alt="Listing Image">
+          <div class="listing-details">
+            <p><strong>Category:</strong> ${listing.category}</p>
+            <p><strong>Title:</strong> ${listing.title}</p>
+            <p class="price">Price: $${listing.price}</p>
+            <p>${listing.description}</p>
+            <div class="buttons">
+              <button onclick="openOfferModal(${index})">Send Offer</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function openOfferModal(index) {
+      selectedListing = filtered[index];
+      document.getElementById('offerPrice').value = '';
+      document.getElementById('offerPhone').value = '';
+      document.getElementById('offerModal').style.display = 'block';
+    }
+
+    function submitOffer() {
+      const offerPrice = parseFloat(document.getElementById('offerPrice').value);
+      const phone = document.getElementById('offerPhone').value.trim();
+
+      if (isNaN(offerPrice) || offerPrice < 0 || offerPrice > selectedListing.price) {
+        alert(`Offer must be between $0 and $${selectedListing.price}.`);
+        return;
+      }
+
+      const phoneDigits = phone.replace(/\D/g, '');
+
+      if (!/^\d{10}$/.test(phoneDigits)) {
+        alert("Please enter a valid 10-digit phone number.");
+      return;
+      }
+
+      const offer = {
+        listingId: selectedListing.id,
+        offerPrice: offerPrice,
+        phone: phoneDigits,
+        timestamp: Date.now(),
+        status: null,
+      };
+
+
+      const offers = JSON.parse(localStorage.getItem('offers') || '[]');
+      offers.push(offer);
+      localStorage.setItem('offers', JSON.stringify(offers));
+
+      alert("Offer submitted!");
+      document.getElementById('offerModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('offerModal');
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    };
+  </script>
+
+</body>
+</html>

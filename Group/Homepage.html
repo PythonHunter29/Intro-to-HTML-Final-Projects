@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>New Craigslist</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      color: purple;
+      text-align: center;
+    }
+
+    .wrapper {
+      display: flex;
+      max-width: 1000px;
+      margin: 20px auto;
+    }
+
+    .sidebarLeft {
+      width: 220px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-right: 20px;
+      height: fit-content;
+    }
+
+    .sidebarRight {
+      width: 220px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-left: 20px;
+      height: fit-content;
+    }
+
+    .offers-button, .toggle-button, .post-button{
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      background-color: #00E;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .offers-button:hover, .toggle-button:hover, .post-button:hover {
+      background-color: #800080;
+    }
+
+    .container {
+      flex: 1;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .city-selector {
+      color: #00E;
+      font-size: 1.4em;
+      font-weight: bold;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+
+    .city-selector:hover {
+      color: #800080;
+      font-size: 1.4em;
+      font-weight: bold;
+      text-decoration: underline;
+      cursor: pointer;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+
+    .city-dropdown {
+      display: none;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      position: absolute;
+      z-index: 10;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .city-dropdown a {
+      display: block;
+      color: #00E;
+      text-decoration: none;
+      margin: 4px 0;
+    }
+
+    .city-dropdown a:hover {
+      color: #800080;
+      text-decoration: underline;
+    }
+
+    .category {
+      margin-bottom: 10px;
+    }
+
+    .category-title {
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 5px;
+      color: #00E;
+    }
+
+    .category-title:hover {
+      color: #800080;
+      text-decoration: underline;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 20px;
+      display: none;
+      margin-top: 0;
+    }
+
+    ul li a {
+      color: #00E;
+      text-decoration: none;
+    }
+
+    ul li a:hover {
+      color: #800080;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>New Craigslist</h1>
+  <div class="wrapper">
+
+    <!-- Sidebar Left -->
+    <div class="sidebarLeft">
+      <button class="post-button" onclick="window.location.href='Post.html'">Post</button>
+      <button class="toggle-button" id="toggleAllBtn" onclick="toggleAll()">Show Sub-Categories</button>
+    </div>
+
+    <!-- Main content -->
+    <div class="container">
+      <div>
+        <span id="currentCity" class="city-selector" onclick="toggleCityDropdown()">Columbus</span>
+        <div id="cityDropdown" class="city-dropdown">
+          <a href="#" onclick="selectCity('Columbus')">Columbus</a>
+          <a href="#" onclick="selectCity('Cleveland')">Cleveland</a>
+          <a href="#" onclick="selectCity('Cincinnati')">Cincinnati</a>
+          <a href="#" onclick="selectCity('Akron')">Akron</a>
+          <a href="#" onclick="selectCity('Dayton')">Dayton</a>
+          <a href="#" onclick="selectCity('Toledo')">Toledo</a>
+          <a href="#" onclick="selectCity('Hamilton')">Hamilton</a>
+          <a href="#" onclick="selectCity('Canton')">Canton</a>
+          <a href="#" onclick="selectCity('Lorain')">Lorain</a>
+          <a href="#" onclick="selectCity('Youngstown')">Youngstown</a>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-title" onclick="toggleList(this)">For Sale</div>
+        <ul>
+          <li><a href="#" onclick="navigateToListings('Vehicles')">Vehicles</a></li>
+          <li><a href="#" onclick="navigateToListings('Furniture')">Furniture</a></li>
+          <li><a href="#" onclick="navigateToListings('Electronics')">Electronics</a></li>
+        </ul>
+      </div>
+
+      <div class="category">
+        <div class="category-title" onclick="toggleList(this)">Jobs</div>
+        <ul>
+          <li><a href="#" onclick="navigateToListings('Salary')">Salary</a></li>
+          <li><a href="#" onclick="navigateToListings('Hourly')">Hourly</a></li>
+          <li><a href="#" onclick="navigateToListings('Gig')">Gig</a></li>
+        </ul>
+      </div>
+
+      <div class="category">
+        <div class="category-title" onclick="toggleList(this)">Housing</div>
+        <ul>
+          <li><a href="#" onclick="navigateToListings('Homes')">Homes</a></li>
+          <li><a href="#" onclick="navigateToListings('Apartments')">Apartments</a></li>
+          <li><a href="#" onclick="navigateToListings('Short Term')">Short Term</a></li>
+        </ul>
+      </div>
+
+      <div class="category">
+        <div class="category-title" onclick="toggleList(this)">Services</div>
+        <ul>
+          <li><a href="#" onclick="navigateToListings('Wellness')">Wellness</a></li>
+          <li><a href="#" onclick="navigateToListings('Technical')">Technical</a></li>
+          <li><a href="#" onclick="navigateToListings('Moving')">Moving</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Sidebar Right -->
+    <div class="sidebarRight">
+      <button class="offers-button" onclick="window.location.href='SentOffers.html'">Sent Offers</button>
+      <button class="offers-button" onclick="window.location.href='ReceivedOffers.html'">Personal Listings</button>
+    </div>
+
+  </div>
+
+  <script>
+    function toggleCityDropdown() {
+      const dropdown = document.getElementById('cityDropdown');
+      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function selectCity(city) {
+      document.getElementById('currentCity').textContent = city;
+      document.getElementById('cityDropdown').style.display = 'none';
+    }
+
+    function navigateToListings(subcategory) {
+      const city = document.getElementById('currentCity').textContent;
+      const url = `Listings.html?city=${encodeURIComponent(city)}&subcategory=${encodeURIComponent(subcategory)}`;
+      window.location.href = url;
+    }
+
+    function toggleList(titleElement) {
+      const ul = titleElement.nextElementSibling;
+      ul.style.display = ul.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function toggleAll() {
+      const lists = document.querySelectorAll('.category ul');
+      const button = document.getElementById('toggleAllBtn');
+      const anyClosed = Array.from(lists).some(list => list.style.display !== 'block');
+
+      lists.forEach(list => {
+        list.style.display = anyClosed ? 'block' : 'none';
+      });
+
+      button.textContent = anyClosed ? 'Collapse Sub-Categories' : 'Show Sub-Categories';
+    }
+    
+    window.addEventListener('click', function (event) {
+      const dropdown = document.getElementById('cityDropdown');
+      const trigger = document.getElementById('currentCity');
+      if (!dropdown.contains(event.target) && event.target !== trigger) {
+        dropdown.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

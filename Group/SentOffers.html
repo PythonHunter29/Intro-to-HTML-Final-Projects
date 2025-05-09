@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sent Offers</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background: #f5f5f5;
+    }
+
+    h2 {
+      color: #800080;
+    }
+
+    .back-home {
+      margin-bottom: 20px;
+    }
+
+    .back-home button {
+      background-color: #00E;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .back-home button:hover {
+      background-color: #800080;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .input-group input[type="text"],
+    .input-group button {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .input-group button {
+      background-color: #00E;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .input-group button:hover {
+      background-color: #800080;
+    }
+
+    .offer {
+      background: white;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    .offer p {
+      margin: 5px 0;
+    }
+
+    .delete-btn {
+      background-color: #cc0000;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      opacity: 0.9;
+    }
+
+    #offersContainer {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="back-home">
+    <button onclick="window.location.href='Homepage.html'">← Back to Home</button>
+  </div>
+
+  <h2>Sent Offers</h2>
+
+  <div class="input-group">
+    <input type="text" id="phoneInput" placeholder="Enter your phone number">
+    <button onclick="loadOffers()">View Sent Offers</button>
+  </div>
+
+  <div id="offersContainer"></div>
+
+  <script>
+    function loadOffers() {
+      const phone = document.getElementById('phoneInput').value.trim();
+      if (!phone) return alert("Please enter your phone number.");
+
+      const allOffers = JSON.parse(localStorage.getItem('offers') || '[]');
+      const userOffers = allOffers.filter(o => o.phone === phone);
+
+      const container = document.getElementById('offersContainer');
+      container.innerHTML = '';
+
+      if (userOffers.length === 0) {
+        container.innerHTML = "<p>No offers found.</p>";
+        return;
+      }
+
+      userOffers.forEach((offer, index) => {
+        const div = document.createElement('div');
+        div.className = 'offer';
+        div.innerHTML = `
+          <p><strong>Listing:</strong> ${offer.listingTitle} (${offer.listingCategory} in ${offer.listingCity})</p>
+          <p><strong>Offer:</strong> $${offer.offerPrice}</p>
+          <p><strong>Status:</strong> ${offer.status}</p>
+          <button class="delete-btn" onclick="deleteOffer(${index}, '${phone}')">Delete</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function deleteOffer(index, phone) {
+      let offers = JSON.parse(localStorage.getItem('offers') || '[]');
+      const filtered = offers.filter(o => o.phone === phone);
+      const toDelete = filtered[index];
+
+      offers = offers.filter(o =>
+        !(o.phone === toDelete.phone &&
+          o.listingTitle === toDelete.listingTitle &&
+          o.timestamp === toDelete.timestamp)
+      );
+
+      localStorage.setItem('offers', JSON.stringify(offers));
+      loadOffers();
+    }
+  </script>
+
+</body>
+</html>

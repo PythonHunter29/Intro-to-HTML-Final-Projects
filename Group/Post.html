@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Post</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+      margin: 0;
+    }
+
+    h2 {
+      color: #800080;
+      text-align: center;
+    }
+
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      margin: 0 auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input, select, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: none;
+    }
+
+    button[type="submit"], .back-home button {
+      padding: 10px 20px;
+      background-color: #00E;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin-top: 20px;
+    }
+
+    button[type="submit"]:hover, .back-home button:hover {
+      background-color: #800080;
+    }
+
+    .back-home {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    #successMsg {
+      color: green;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Post</h2>
+
+  <form id="postForm">
+    <label for="city">City</label>
+    <select id="city" required>
+      <option>Columbus</option>
+      <option>Cleveland</option>
+      <option>Cincinnati</option>
+      <option>Akron</option>
+      <option>Dayton</option>
+      <option>Toledo</option>
+      <option>Hamilton</option>
+      <option>Canton</option>
+      <option>Lorain</option>
+      <option>Youngstown</option>
+    </select>
+
+    <label for="category">Subcategory</label>
+    <select id="category" required>
+      <optgroup label="For Sale">
+        <option>Vehicles</option>
+        <option>Furniture</option>
+        <option>Electronics</option>
+      </optgroup>
+      <optgroup label="Jobs">
+        <option>Salary</option>
+        <option>Hourly</option>
+        <option>Gig</option>
+      </optgroup>
+      <optgroup label="Housing">
+        <option>Homes</option>
+        <option>Apartments</option>
+        <option>Short Term</option>
+      </optgroup>
+      <optgroup label="Services">
+        <option>Wellness</option>
+        <option>Technical</option>
+        <option>Moving</option>
+      </optgroup>
+    </select>
+
+    <label for="image">Image</label>
+    <input type="file" accept="image/*" id="image" required />    
+
+    <label for="title">Title</label>
+    <input type="text" id="title" name="title" maxlength="50" required>
+
+    <label for="price">Price ($)</label>
+    <input type="number" id="price" name="price" required min="0" max="1000000">
+
+    <label for="description">Description</label>
+    <textarea id="description" rows="5" maxlength="200" placeholder="Describe what you are posting..." required></textarea>
+
+    <label for="phone">Phone Number</label>
+    <input type="tel" id="phone" required />
+
+    <button type="submit">Post Listing</button>
+
+    <div class="back-home">
+      <button type="button" onclick="window.location.href='Homepage.html'">← Back to Home</button>
+    </div>
+  </form>
+
+  <p id="successMsg" style="display:none;">Listing posted successfully!</p>
+
+<script>
+  document.getElementById('postForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const city = document.getElementById('city').value;
+    const category = document.getElementById('category').value;
+    const title = document.getElementById('title').value.trim();
+    const description = document.getElementById('description').value.trim();
+    const price = parseFloat(document.getElementById('price').value);
+    const phone = document.getElementById('phone').value.trim();
+    const imageFile = document.getElementById('image').files[0];
+
+    if (!imageFile) {
+      alert("Please upload a picture.");
+      return;
+    }
+
+    const phoneDigits = phone.replace(/\D/g, '');
+
+    if (!/^\d{10}$/.test(phoneDigits)) {
+      alert("Please enter a valid 10-digit phone number.");
+    return;
+    }
+
+
+    if (price < 0 || price > 1000000) {
+      alert("Price must be between $0 and $1,000,000.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = function () {
+      const imageBase64 = reader.result;
+
+      const newListing = {
+        id: crypto.randomUUID(),
+        city,
+        category,
+        title,
+        description,
+        price,
+        phone,
+        image: imageBase64
+      };
+
+      const listings = JSON.parse(localStorage.getItem('listings') || '[]');
+      listings.push(newListing);
+      localStorage.setItem('listings', JSON.stringify(listings));
+
+      document.getElementById('successMsg').style.display = 'block';
+      document.getElementById('postForm').reset();
+    };
+
+    reader.readAsDataURL(imageFile);
+  });
+</script>
+
+</body>
+</html>

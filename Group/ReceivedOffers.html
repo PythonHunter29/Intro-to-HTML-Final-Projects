@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Personal Listings</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background: #f5f5f5;
+    }
+
+    h2 {
+      color: #800080;
+    }
+
+    .back-home {
+      margin-bottom: 20px;
+    }
+
+    .back-home button {
+      background-color: #00E;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .back-home button:hover {
+      background-color: #800080;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .input-group input[type="tel"],
+    .input-group button {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .input-group button {
+      background-color: #00E;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .input-group button:hover {
+      background-color: #800080;
+    }
+
+    .listing {
+      background: white;
+      padding: 20px;
+      margin-bottom: 25px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    .listing img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+
+    .offer-box {
+      background: #f0f0f0;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+
+    .buttons button, .delete {
+      margin-right: 10px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100px;
+      text-align: center;
+    }
+
+    .accept {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .accept:hover {
+      background-color: #218838;
+    }
+
+    .reject {
+      background-color: #ffc107;
+      color: white;
+    }
+
+    .reject:hover {
+      background-color: #e0a800;
+    }
+
+    .delete {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .delete:hover {
+      background-color: #c82333;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="back-home">
+    <button onclick="window.location.href='Homepage.html'">← Back to Home</button>
+  </div>
+
+  <h2>Personal Listings</h2>
+
+  <div class="input-group">
+    <input type="tel" id="ownerPhone" placeholder="Enter your phone number">
+    <button onclick="loadPersonalListings()">View Personal Listings</button>
+  </div>
+
+  <div id="offersContainer"></div>
+
+  <script>
+    function loadPersonalListings() {
+      const phone = document.getElementById('ownerPhone').value.trim();
+      if (!phone) {
+        alert("Please enter your phone number.");
+        return;
+      }
+
+      const listings = JSON.parse(localStorage.getItem('listings') || '[]');
+      const offers = JSON.parse(localStorage.getItem('offers') || '[]');
+
+      const userListings = listings.filter(listing => listing.phone === phone);
+      const container = document.getElementById('offersContainer');
+      container.innerHTML = '';
+
+      if (userListings.length === 0) {
+        container.innerHTML = "<p>You have no personal listings.</p>";
+        return;
+      }
+
+      userListings.forEach(listing => {
+        const div = document.createElement('div');
+        div.className = 'listing';
+
+        const listingOffers = offers
+          .filter(offer => offer.listingId === listing.id && !offer.status)
+          .sort((a, b) => b.price - a.price || new Date(b.timestamp) - new Date(a.timestamp))
+          .slice(0, 10);
+
+        div.innerHTML = `
+          <p><strong>City:</strong> ${listing.city}</p>
+          <p><strong>Subcategory:</strong> ${listing.category}</p>
+          <img src="${listing.image}" alt="Listing Image">
+          <p><strong>Title:</strong> ${listing.title}</p>
+          <p><strong>Price:</strong> $${listing.price}</p>
+          <p><strong>Description:</strong> ${listing.description}</p>
+          <p><strong>Phone Number:</strong> ${listing.phone}</p>
+        `;
+
+        const allOffers = JSON.parse(localStorage.getItem('offers') || '[]');
+        const offerBox = document.createElement('div');
+        offerBox.className = 'offer-box';
+
+        const acceptedOffer = allOffers.find(o => o.listingId === listing.id && o.status === 'accepted');
+        const topOffer = listingOffers[0];
+
+
+        if (acceptedOffer) {
+          const offerPrice = document.createElement('p');
+          offerPrice.textContent = `Accepted Offer: $${acceptedOffer.offerPrice}`;
+          offerBox.appendChild(offerPrice);
+
+          const phone = document.createElement('p');
+          phone.textContent = `Offerer's Phone: ${acceptedOffer.phone}`;
+          offerBox.appendChild(phone);
+        } else if (topOffer) {
+          const offerPrice = document.createElement('p');
+          offerPrice.textContent = `Top Offer: $${topOffer.offerPrice}`;
+          offerBox.appendChild(offerPrice);
+        } else {
+          offerBox.innerHTML = `<p>No Offers</p>`;
+        }
+
+        const buttonGroup = document.createElement('div');
+        buttonGroup.className = 'buttons';
+
+        // Accept Button
+        const acceptBtn = document.createElement('button');
+        acceptBtn.className = 'accept';
+        acceptBtn.textContent = 'Accept';
+        acceptBtn.disabled = !topOffer || !!acceptedOffer;
+        acceptBtn.onclick = () => updateOfferStatus(topOffer, 'accepted', listing.id);
+
+        // Reject Button
+        const rejectBtn = document.createElement('button');
+        rejectBtn.className = 'reject';
+        rejectBtn.textContent = 'Reject';
+        rejectBtn.disabled = !topOffer || !!acceptedOffer;
+        rejectBtn.onclick = () => updateOfferStatus(topOffer, 'rejected', listing.id);
+
+        // Delete Button (always works)
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = () => deleteListing(listing.id);
+
+        // Append buttons
+        buttonGroup.appendChild(acceptBtn);
+        buttonGroup.appendChild(rejectBtn);
+        buttonGroup.appendChild(deleteBtn);
+        offerBox.appendChild(buttonGroup);
+
+
+        div.appendChild(offerBox);
+        container.appendChild(div);
+      });
+    }
+
+    function updateOfferStatus(offer, status, listingId) {
+      const offers = JSON.parse(localStorage.getItem('offers') || '[]');
+      const index = offers.findIndex(o => o.timestamp === offer.timestamp);
+
+      if (index > -1) {
+        offers[index].status = status;
+        localStorage.setItem('offers', JSON.stringify(offers));
+        loadPersonalListings();
+      }
+    }
+
+    function deleteListing(listingId) {
+      let listings = JSON.parse(localStorage.getItem('listings') || '[]');
+      listings = listings.filter(listing => listing.id !== listingId);
+      localStorage.setItem('listings', JSON.stringify(listings));
+      loadPersonalListings();
+    }
+  </script>
+
+</body>
+</html>
